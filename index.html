@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tread — Carbon Footprint Awareness Platform</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ============ NAV ============ -->
+<header class="site-header">
+  <div class="header-inner">
+    <a href="#top" class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M16 4c-3 0-5 2.5-5 6 0 3 2 5 2 8 0 2.5-1.5 4-1.5 6 0 1.5 1.5 2 2.5 1 1.5-1.5 2-4 2-6s-1-4-1-6c0-2 1-3 1-3s2 1.5 2 4c0 2.5-1.5 4.5-1.5 7 0 2 1 3.5 2.5 2 1.5-1.5 1.5-4 1.5-6.5C21 8.5 19 4 16 4z" fill="currentColor"/>
+      </svg>
+      <span>Tread</span>
+    </a>
+    <nav class="main-nav" aria-label="Primary">
+      <a href="#measure">Measure</a>
+      <a href="#breakdown">Breakdown</a>
+      <a href="#actions">Actions</a>
+      <a href="#journal">Journal</a>
+    </nav>
+    <div class="header-stat">
+      <span class="header-stat-label">Logged today</span>
+      <span class="header-stat-value" id="streakHeaderValue">0-day streak</span>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- ============ HERO / CALCULATOR ============ -->
+  <section class="hero" id="measure">
+    <div class="hero-inner">
+
+      <div class="hero-intro">
+        <p class="eyebrow">[ Challenge 03 — Field Reading ]</p>
+        <h1>Every life leaves<br>a mark on the ground.<br><em>Find out the size of yours.</em></h1>
+        <p class="hero-sub">Adjust the dials to match how you actually live. The reading updates in real time — no sign-up, no quiz, just an honest estimate in tonnes of CO₂e per year.</p>
+      </div>
+
+      <div class="reading-panel">
+        <div class="reading-display">
+          <span class="reading-label">Your annual reading</span>
+          <div class="reading-number">
+            <span id="totalFootprint">0.0</span>
+            <span class="reading-unit">t CO₂e / yr</span>
+          </div>
+          <div class="reading-compare" id="compareText">
+            calculating against the national average&hellip;
+          </div>
+          <div class="reading-gauge">
+            <div class="gauge-track">
+              <div class="gauge-fill" id="gaugeFill"></div>
+              <div class="gauge-marker" id="gaugeAvgMarker">
+                <span>avg</span>
+              </div>
+            </div>
+            <div class="gauge-scale">
+              <span>0t</span>
+              <span>5t</span>
+              <span>10t</span>
+              <span>15t+</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- INPUT GRID -->
+    <div class="input-deck">
+
+      <div class="input-card" data-category="transport">
+        <div class="input-card-head">
+          <span class="input-icon" aria-hidden="true">🚗</span>
+          <div>
+            <h3>Transport</h3>
+            <p>How you move through the week</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Mode</span>
+          </span>
+          <select id="transportMode">
+            <option value="0.05">Walk / cycle mostly</option>
+            <option value="0.08">Public transit</option>
+            <option value="0.18" selected>Petrol / diesel car</option>
+            <option value="0.05">Electric vehicle</option>
+            <option value="0.25">Motorbike + car mix</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Distance per week</span>
+            <span class="field-value mono" id="distanceVal">120 km</span>
+          </span>
+          <input type="range" id="distanceRange" min="0" max="500" value="120" step="5">
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Flights per year</span>
+            <span class="field-value mono" id="flightsVal">1</span>
+          </span>
+          <input type="range" id="flightsRange" min="0" max="10" value="1" step="1">
+        </label>
+      </div>
+
+      <div class="input-card" data-category="energy">
+        <div class="input-card-head">
+          <span class="input-icon" aria-hidden="true">⚡</span>
+          <div>
+            <h3>Home energy</h3>
+            <p>What powers your space</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Monthly electricity bill</span>
+            <span class="field-value mono" id="electricityVal">₹2,500</span>
+          </span>
+          <input type="range" id="electricityRange" min="0" max="10000" value="2500" step="100">
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Household size</span>
+            <span class="field-value mono" id="householdVal">3 people</span>
+          </span>
+          <input type="range" id="householdRange" min="1" max="8" value="3" step="1">
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Primary energy source</span>
+          </span>
+          <select id="energySource">
+            <option value="1.0" selected>Grid (mixed / coal-heavy)</option>
+            <option value="0.6">Grid (renewable-leaning)</option>
+            <option value="0.3">Solar / own renewables</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="input-card" data-category="diet">
+        <div class="input-card-head">
+          <span class="input-icon" aria-hidden="true">🍽️</span>
+          <div>
+            <h3>Diet</h3>
+            <p>What's usually on the plate</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Diet pattern</span>
+          </span>
+          <select id="dietType">
+            <option value="2.5">Meat with most meals</option>
+            <option value="1.7" selected>Meat a few times a week</option>
+            <option value="1.1">Vegetarian</option>
+            <option value="0.8">Vegan</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Food wasted per week</span>
+            <span class="field-value mono" id="wasteVal">Moderate</span>
+          </span>
+          <input type="range" id="wasteRange" min="0" max="3" value="1" step="1">
+        </label>
+      </div>
+
+      <div class="input-card" data-category="waste">
+        <div class="input-card-head">
+          <span class="input-icon" aria-hidden="true">♻️</span>
+          <div>
+            <h3>Waste &amp; goods</h3>
+            <p>What you consume and discard</p>
+          </div>
+        </div>
+
+        <label class="field">
+          <span class="field-row">
+            <span>Recycling habit</span>
+          </span>
+          <select id="recyclingHabit">
+            <option value="1.2">Rarely separate waste</option>
+            <option value="0.8" selected>Sometimes recycle</option>
+            <option value="0.4">Always recycle / compost</option>
+          </select>
+        </label>
+
+        <label class="field">
+          <span class="field-row">
+            <span>New goods bought monthly</span>
+            <span class="field-value mono" id="goodsVal">Average</span>
+          </span>
+          <input type="range" id="goodsRange" min="0" max="3" value="1" step="1">
+        </label>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ============ BREAKDOWN / FOOTPRINT TRAIL ============ -->
+  <section class="breakdown" id="breakdown">
+    <div class="section-head">
+      <p class="eyebrow">[ The Trail ]</p>
+      <h2>Where the weight falls</h2>
+      <p class="section-sub">Each print below is sized by how much it contributes to your total. The deepest prints are where change matters most.</p>
+    </div>
+
+    <div class="trail-wrap">
+      <svg id="trailSvg" viewBox="0 0 1000 220" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+    </div>
+
+    <div class="legend" id="legend"></div>
+  </section>
+
+  <!-- ============ INSIGHTS ============ -->
+  <section class="insights" id="insights">
+    <div class="section-head">
+      <p class="eyebrow">[ Field Notes ]</p>
+      <h2>What would actually move the needle</h2>
+      <p class="section-sub">Based on your biggest category, here's where effort pays off fastest.</p>
+    </div>
+    <div class="insight-cards" id="insightCards"></div>
+  </section>
+
+  <!-- ============ ACTIONS / HABIT TRACKER ============ -->
+  <section class="actions" id="actions">
+    <div class="section-head">
+      <p class="eyebrow">[ Daily Practice ]</p>
+      <h2>Small, repeated, real</h2>
+      <p class="section-sub">Check off what you actually did today. Streaks build from consistency, not perfection.</p>
+    </div>
+
+    <div class="actions-layout">
+      <div class="action-list" id="actionList"></div>
+
+      <aside class="streak-panel">
+        <div class="streak-card">
+          <span class="streak-label">Current streak</span>
+          <div class="streak-number"><span id="streakCount">0</span><span class="streak-unit">days</span></div>
+          <p class="streak-note" id="streakNote">Check off an action today to start your streak.</p>
+        </div>
+        <div class="streak-card streak-secondary">
+          <span class="streak-label">Total actions logged</span>
+          <div class="streak-number small"><span id="totalActionsLogged">0</span></div>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <!-- ============ JOURNAL / HISTORY ============ -->
+  <section class="journal" id="journal">
+    <div class="section-head">
+      <p class="eyebrow">[ Journal ]</p>
+      <h2>Your reading, over time</h2>
+      <p class="section-sub">Every time you save a reading, it's plotted here. Watch the line, not the moment.</p>
+    </div>
+
+    <div class="journal-layout">
+      <div class="journal-chart-wrap">
+        <svg id="historySvg" viewBox="0 0 800 260" preserveAspectRatio="xMidYMid meet" aria-hidden="true"></svg>
+        <p class="journal-empty" id="journalEmpty">No readings saved yet — save today's to begin your line.</p>
+      </div>
+      <div class="journal-side">
+        <button class="btn-primary" id="saveReadingBtn">Save today's reading</button>
+        <p class="journal-hint">Saves your current calculator result with today's date. One save per day — saving again today updates it.</p>
+        <ul class="journal-list" id="journalList"></ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <p>Built for [Challenge 3] Carbon Footprint Awareness Platform — Virtual: PromptWars.</p>
+  <p class="footer-fine">Estimates are directional, based on common regional averages — not a substitute for a verified carbon audit.</p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
