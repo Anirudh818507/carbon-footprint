@@ -73,29 +73,45 @@
   const GOODS_LABELS = ["Minimal", "Average", "Frequent shopper", "Always buying new"];
 
   /* ---------------------------------------------------------
-     CALCULATOR
+     SECURITY: defensive HTML escaping
+     All dynamic strings rendered below originate from this app's
+     own fixed config (TIPS, DEFAULT_ACTIONS, CATEGORY_META) or from
+     numbers/dates computed locally — never from a raw open-text user
+     input field. Escaping is still applied defensively wherever a
+     string could end up inside innerHTML, so the output is safe even
+     if this data source changes in the future.
   --------------------------------------------------------- */
-  function calculateFootprint() {
+  function escapeHTML(str) {
+    const div = document.createElement("div");
+    div.textContent = String(str);
+    return div.innerHTML;
+  }
+
+  /* ---------------------------------------------------------
+     CALCULATOR
+     computeFootprint() is a pure function — no DOM access — so
+     it can be unit tested directly (see tests.js). calculateFootprint()
+     is the thin wrapper that reads current form values and calls it.
+  --------------------------------------------------------- */
+  function computeFootprint(inputs) {
+    const {
+      transportFactor, weeklyKm, flights,
+      bill, household, sourceMultiplier,
+      dietBase, wasteLevel,
+      recyclingFactor, goodsLevel
+    } = inputs;
+
     // Transport: weekly km * weekly factor * 52 + flights
-    const transportFactor = parseFloat(el.transportMode.value);
-    const weeklyKm = parseFloat(el.distanceRange.value);
-    const flights = parseFloat(el.flightsRange.value);
     const transportTonnes = (weeklyKm * transportFactor * 52) / 1000 + flights * 0.25;
 
     // Energy: monthly bill (INR) -> rough proxy * 12 * source multiplier / household share
-    const bill = parseFloat(el.electricityRange.value);
-    const household = parseFloat(el.householdRange.value);
-    const sourceMultiplier = parseFloat(el.energySource.value);
-    const energyTonnes = ((bill * 0.0001 * 12) * sourceMultiplier) / household;
+    const safeHousehold = household > 0 ? household : 1; // guard against divide-by-zero
+    const energyTonnes = ((bill * 0.0001 * 12) * sourceMultiplier) / safeHousehold;
 
     // Diet: annual base by diet type, adjusted by waste level
-    const dietBase = parseFloat(el.dietType.value);
-    const wasteLevel = parseFloat(el.wasteRange.value); // 0-3
     const dietTonnes = dietBase + wasteLevel * 0.15;
 
     // Waste & goods
-    const recyclingFactor = parseFloat(el.recyclingHabit.value);
-    const goodsLevel = parseFloat(el.goodsRange.value); // 0-3
     const wasteTonnes = recyclingFactor + goodsLevel * 0.3;
 
     const total = transportTonnes + energyTonnes + dietTonnes + wasteTonnes;
@@ -107,6 +123,27 @@
       waste: Math.max(0, wasteTonnes),
       total: Math.max(0, total)
     };
+  }
+
+  function calculateFootprint() {
+    return computeFootprint({
+      transportFactor: parseFloat(el.transportMode.value),
+      weeklyKm: parseFloat(el.distanceRange.value),
+      flights: parseFloat(el.flightsRange.value),
+      bill: parseFloat(el.electricityRange.value),
+      household: parseFloat(el.householdRange.value),
+      sourceMultiplier: parseFloat(el.energySource.value),
+      dietBase: parseFloat(el.dietType.value),
+      wasteLevel: parseFloat(el.wasteRange.value),
+      recyclingFactor: parseFloat(el.recyclingHabit.value),
+      goodsLevel: parseFloat(el.goodsRange.value)
+    });
+  }
+
+  // Expose for the test suite (tests.js) and any external evaluation tooling.
+  // Harmless in production — just a reference to a pure function, no side effects.
+  if (typeof window !== "undefined") {
+    window.TreadCalculator = { computeFootprint };
   }
 
   /* ---------------------------------------------------------
@@ -208,7 +245,7 @@
       const pct = Math.round((values[i] / total) * 100);
       return `<div class="legend-item">
         <span class="legend-dot" style="background:${meta.color}"></span>
-        <span class="legend-cat">${meta.label}</span>
+        <span class="legend-cat">${escapeHTML(meta.label)}</span>
         <span class="legend-pct">${pct}%</span>
       </div>`;
     }).join("");
@@ -297,9 +334,9 @@
     el.insightCards.innerHTML = tips.map((tip, i) => {
       const isPriority = i === 0;
       return `<div class="insight-card ${isPriority ? "priority" : ""}">
-        <span class="insight-tag">${tip.tag}</span>
-        <h4>${tip.title}</h4>
-        <p>${tip.body}</p>
+        <span class="insight-tag">${escapeHTML(tip.tag)}</span>
+        <h4>${escapeHTML(tip.title)}</h4>
+        <p>${escapeHTML(tip.body)}</p>
       </div>`;
     }).join("");
   }
@@ -372,8 +409,8 @@
       const isChecked = !!todayChecked[action.id];
       return `<div class="action-item ${isChecked ? "checked" : ""}" data-action-id="${action.id}" role="checkbox" aria-checked="${isChecked}" tabindex="0">
         <span class="action-checkbox">${checkmarkSVG()}</span>
-        <span class="action-text">${action.text}</span>
-        <span class="action-impact mono">${action.impact}</span>
+        <span class="action-text">${escapeHTML(action.text)}</span>
+        <span class="action-impact mono">${escapeHTML(action.impact)}</span>
       </div>`;
     }).join("");
 
